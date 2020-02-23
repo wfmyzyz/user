@@ -4,6 +4,7 @@ import com.wfmyzyz.user.interceptor.ControllerBackInterceptor;
 import com.wfmyzyz.user.interceptor.ControllerBaseInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -22,11 +23,11 @@ public class WebAppConfig implements WebMvcConfigurer {
     * 允许跨域
     * @param registry
     */
-    /*@Override
+
+    @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowCredentials(true).allowedHeaders("*").allowedOrigins("*").allowedMethods("*");
-    }*/
-
+    }
     /**
     * 拦截器
     * @param registry

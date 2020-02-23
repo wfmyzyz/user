@@ -35,10 +35,16 @@ public class ControllerBackInterceptor implements HandlerInterceptor {
         response.setContentType("text/html;charset=UTF-8");
         String requestURI = request.getRequestURI();
         logger.info("Back访问:IP地址["+ RequestUtils.getIpAddr(request)+"],访问路径["+request.getRequestURL()+"],匹配的路径["+requestURI+"]");
-        if (tokenUtils.getUserIdByToken(request) == null){
+        if (request.getMethod().equals("OPTIONS")){
+            response.setStatus(HttpServletResponse.SC_OK);
+            return true;
+        }
+        if (tokenUtils.tokenIsExceed(request)){
             tokenUtils.needLogin(response);
             return false;
         }
+        //延长redis过期时间
+        tokenUtils.extendToken(request);
         if (userRoleService.checkUserIsSuperAdmin(request)){
             return true;
         }

@@ -2,6 +2,7 @@ package com.wfmyzyz.user.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wfmyzyz.user.config.ProjectConfig;
 import com.wfmyzyz.user.user.domain.Role;
 import com.wfmyzyz.user.user.domain.UserRole;
 import com.wfmyzyz.user.user.mapper.UserRoleMapper;
@@ -162,7 +163,13 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
 
     @Override
     public boolean checkUserIsSuperAdmin(HttpServletRequest request) {
-        Integer userId = tokenUtils.getUserIdByToken(request);
+        String token = request.getHeader(ProjectConfig.TOKEN_KEY);
+        return checkUserIsSuperAdmin(token);
+    }
+
+    @Override
+    public boolean checkUserIsSuperAdmin(String token) {
+        Integer userId = tokenUtils.getUserIdByToken(token);
         List<Role> roleList = roleService.getRoleListByUserId(userId);
         if (roleList == null || roleList.size() <= 0){
             return false;

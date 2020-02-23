@@ -104,11 +104,11 @@
                                     AuthorityTree.changeTreeNodeAdd(true); // 添加成功
                                     return
                                 }
-                                layer.alert(result.data.error)
+                                layer.alert(result.map.error)
                                 AuthorityTree.changeTreeNodeAdd(false); // 添加失败
                             },
                             error: function(result){
-                                layer.alert(result.data.error)
+                                layer.alert(result.map.error)
                                 AuthorityTree.changeTreeNodeAdd(false); // 添加失败
                             }
                         });

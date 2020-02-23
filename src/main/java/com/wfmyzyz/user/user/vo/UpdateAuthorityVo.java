@@ -16,6 +16,10 @@ public class UpdateAuthorityVo {
 
     private String authorityType;
 
+    private Integer sort;
+
+    private String display;
+
     public Integer getAuthorityId() {
         return authorityId;
     }
@@ -48,6 +52,22 @@ public class UpdateAuthorityVo {
         this.authorityType = authorityType;
     }
 
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
+    }
+
     @Override
     public String toString() {
         return "UpdateAuthorityVo{" +
@@ -55,6 +75,8 @@ public class UpdateAuthorityVo {
                 ", authorityName='" + authorityName + '\'' +
                 ", authorityUrl='" + authorityUrl + '\'' +
                 ", authorityType='" + authorityType + '\'' +
+                ", sort=" + sort +
+                ", display='" + display + '\'' +
                 '}';
     }
 }

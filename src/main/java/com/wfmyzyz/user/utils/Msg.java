@@ -49,6 +49,13 @@ public class Msg {
         return msg;
     }
 
+    public static Msg error(String message){
+        Msg msg = new Msg();
+        msg.setCode(0);
+        msg.setMsg(message);
+        return msg;
+    }
+
     public Msg add(String key,Object value){
         map.put(key,value);
         return this;

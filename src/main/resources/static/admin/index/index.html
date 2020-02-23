@@ -10,13 +10,12 @@
 <link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
 <link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
 <script src="../config.js"></script>
-	<script src="../../layuiadmin/jquery-3.4.1.js"></script>
-	<script src="../../layuiadmin/jquery.cookie.js"></script>
+<script src="../../layuiadmin/jquery-3.4.1.js"></script>
+<script src="../../layuiadmin/jquery.cookie.js"></script>
+<script src="../../layuiadmin/layui/layui.js"></script>
+<script src="../../layuiadmin/layui/tools.js?7899"></script>
+<script src="../needLogin.js"></script>
 
-
-	<script>
-	/^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
-</script>
 </head>
 <body class="layui-layout-body">
 
@@ -63,14 +62,16 @@
 					<div class="layui-logo" lay-href="blogList.html">
 						<span>layuiAdmin</span>
 					</div>
+					<ul class="layui-nav layui-nav-tree"  lay-filter="test" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
 
-					<ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
-						<li data-name="home" class="layui-nav-item layui-nav-itemed">
-							<a href="javascript:;" lay-tips="主页" lay-direction="2"> <i class="layui-icon layui-icon-home"></i> <cite>列表页面</cite> </a>
-							<dl class="layui-nav-child" id='pageList'>
-							</dl>
-						</li>
 					</ul>
+<!--					<ul class="layui-nav layui-nav-tree pageList" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">-->
+<!--						<li data-name="home" class="layui-nav-item layui-nav-itemed">-->
+<!--							<a href="javascript:;" lay-tips="主页" lay-direction="2"> <i class="layui-icon layui-icon-home"></i> <cite>列表页面</cite> </a>-->
+<!--							<dl class="layui-nav-child" id='pageList'>-->
+<!--							</dl>-->
+<!--						</li>-->
+<!--					</ul>-->
 				</div>
 			</div>
 
@@ -113,31 +114,67 @@
 		</div>
 	</div>
 
-	<script src="../../layuiadmin/layui/layui.js"></script>
-	<script src="../../layuiadmin/layui/tools.js?7899"></script>
 	<script>
 		layui.config({
 			base : '../../layuiadmin/' //静态资源所在路径
 		}).extend({
 			index : 'lib/index' //主入口模块
-		}).use([ 'index', 'form', 'laydate', 'layedit' ],function() {
+		}).use([ 'index', 'form', 'laydate', 'layedit','element' ],function() {
 			var admin = layui.admin, element = layui.element, layer = layui.layer, laydate = layui.laydate, form = layui.form;
 			$(function() {
 				//isLogin();
-				$('#pageList').append('<dd data-name="console"><a lay-href="userList.html">用户列表</a></dd>');
-				$('#pageList').append('<dd data-name="console"><a lay-href="roleList.html">角色列表</a></dd>');
-				$('#pageList').append('<dd data-name="console"><a lay-href="authorityList.html">权限列表</a></dd>');
+				needLogin();
+				// $('#pageList').append('<dd data-name="console"><a lay-href="userList.html">用户列表</a></dd>');
+				// $('#pageList').append('<dd data-name="console"><a lay-href="roleList.html">角色列表</a></dd>');
+				// $('#pageList').append('<dd data-name="console"><a lay-href="authorityList.html">权限列表</a></dd>');
 
 				//$('#nickname').text(JSON.parse(sessionStorage.getItem("user")).username);
+				$.ajax({
+					type: "get",
+					url: backRoot + "/api/back/getMenuList",
+					headers: {"token":$.cookie("token")},
+					success: function (result) {
+						console.log(result)
+						var list = "";
+						for(var i=0;i<result.map.data.length;i++){
+							var resultList = "";
+							if(result.map.data[i].children.length != 0){
+								resultList = findSonList(result.map.data[i].children);
+								list += '<li data-name="home" class="layui-nav-item">' +
+										'<a href="javascript:;" lay-tips="'+result.map.data[i].authority.name+'" lay-direction="2"> <i class="layui-icon layui-icon-home"></i> <cite>'+result.map.data[i].authority.name+'</cite></a>' +
+										resultList +
+										'</li>';
+							}else {
+								list += '<li data-name="home" class="layui-nav-item">' +
+										'<a href="javascript:;" lay-href="'+result.map.data[i].authority.url+'" lay-tips="'+result.map.data[i].authority.name+'" lay-direction="2"> <i class="layui-icon layui-icon-home"></i> <cite>'+result.map.data[i].authority.name+'</cite> </a>' +
+										'</li>';
+							}
+						}
+						$(".layui-nav-tree").append(list);
+						element.init();
+					}
+				})
 			});
-			$.ajax({
-				type: "get",
-				url: backRoot + "/api/back/getMenuList",
-				headers: {"token":$.cookie("token")},
-				success: function (result) {
-					console.log(result)
+			function findSonList(list) {
+				var listTxt = '<dl class="layui-nav-child">';
+				for(var i=0;i<list.length;i++){
+					var resultListTxt = "";
+					if(list[i].children.length != 0){
+						resultListTxt = findSonList(list[i].children);
+						listTxt += '<dd data-name="console">' +
+								'<a href="javascript:;">'+list[i].authority.name+'</a>' +
+								resultListTxt +
+								'</dd>';
+					}else {
+						listTxt += '<dd data-name="console">' +
+								'<a lay-href="'+list[i].authority.url+'">'+list[i].authority.name+'</a>' +
+								resultListTxt +
+								'</dd>';
+					}
 				}
-			})
+				listTxt += '</dl>';
+				return listTxt;
+			}
 		});
 	</script>
 </body>

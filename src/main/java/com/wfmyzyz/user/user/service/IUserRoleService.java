@@ -118,4 +118,11 @@ public interface IUserRoleService extends IService<UserRole> {
      * @return
      */
     boolean checkUserIsSuperAdmin(HttpServletRequest request);
+
+    /**
+     * 根据token判断当前用户是否是超级管理员
+     * @param token
+     * @return
+     */
+    boolean checkUserIsSuperAdmin(String token);
 }

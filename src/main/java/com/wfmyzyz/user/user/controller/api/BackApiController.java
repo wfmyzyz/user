@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 /**
@@ -23,19 +27,6 @@ import java.util.List;
 @RestController
 @RequestMapping("api/back")
 public class BackApiController {
+    
 
-    @Autowired
-    private TokenUtils tokenUtils;
-    @Autowired
-    private IAuthorityService authorityService;
-
-    @ApiOperation(value="查询菜单列表", notes="查询菜单列表" ,httpMethod="POST")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="token",value="token",required=true,paramType="header")
-    })
-    @RequestMapping(value = "/getMenuList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public Msg getMenuList(HttpServletRequest request){
-        List<AuthorityTreeVo> authorityList = authorityService.getMenuListByUserId(request);
-        return Msg.success().add("data",authorityList);
-    }
 }

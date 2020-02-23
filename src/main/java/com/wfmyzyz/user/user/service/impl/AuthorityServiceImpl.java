@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wfmyzyz.user.user.domain.Authority;
 import com.wfmyzyz.user.user.domain.Role;
 import com.wfmyzyz.user.user.domain.RoleAuthority;
+import com.wfmyzyz.user.user.enums.AuthorityDisplayEnum;
 import com.wfmyzyz.user.user.enums.AuthorityTypeEnum;
 import com.wfmyzyz.user.user.mapper.AuthorityMapper;
 import com.wfmyzyz.user.user.service.IAuthorityService;
@@ -50,6 +51,8 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
         authority.setUrl(addAuthorityVo.getUrl());
         authority.setType(addAuthorityVo.getType());
         authority.setFAuthorityId(addAuthorityVo.getfAuthorityId());
+        authority.setSort(addAuthorityVo.getSort() != null ? addAuthorityVo.getSort() : 0);
+        authority.setDisplay(addAuthorityVo.getDisplay() != null ? addAuthorityVo.getDisplay() : AuthorityDisplayEnum.显示.toString());
         return this.save(authority);
     }
 
@@ -60,6 +63,8 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
         authority.setType(updateAuthorityVo.getAuthorityType());
         authority.setUrl(updateAuthorityVo.getAuthorityUrl());
         authority.setName(updateAuthorityVo.getAuthorityName());
+        authority.setSort(updateAuthorityVo.getSort());
+        authority.setDisplay(updateAuthorityVo.getDisplay());
         return this.updateById(authority);
     }
 
@@ -75,7 +80,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
 
     @Override
     public List<TreeVo> listTree() {
-        List<Authority> list = this.list();
+        List<Authority> list = this.list(new QueryWrapper<Authority>().orderByAsc("sort"));
         List<TreeVo> treeVoList = new ArrayList<>();
         list.forEach(authority -> {
             if (Objects.equals(authority.getFAuthorityId(),0)){
@@ -93,6 +98,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
         authorityIdList.forEach(authority -> {
             this.recursionGetZAuthorityId(list,authorityList,authority);
         });
+        authorityList.addAll(authorityIdList);
         return authorityList;
     }
 
@@ -171,9 +177,11 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
             }
             List<Integer> authorityList = roleAuthorityList.stream().map(RoleAuthority::getAuthorityId).collect(Collectors.toList());
             list = authorityLambdaQueryChainWrapper.eq(Authority::getType, AuthorityTypeEnum.页面.toString()).
-                    in(Authority::getAuthorityId, authorityList).list();
+                    eq(Authority::getDisplay,AuthorityDisplayEnum.显示.toString()).
+                    in(Authority::getAuthorityId, authorityList).orderByAsc(Authority::getSort).list();
         }else {
-            list = authorityLambdaQueryChainWrapper.eq(Authority::getType, AuthorityTypeEnum.页面.toString()).list();
+            list = authorityLambdaQueryChainWrapper.eq(Authority::getType, AuthorityTypeEnum.页面.toString()).
+                    eq(Authority::getDisplay,AuthorityDisplayEnum.显示.toString()).orderByAsc(Authority::getSort).list();
         }
         if (list == null || list.size() <= 0){
             return null;

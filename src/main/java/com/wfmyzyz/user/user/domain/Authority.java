@@ -46,6 +46,16 @@ public class Authority implements Serializable {
     private Integer fAuthorityId;
 
     /**
+     * 排序
+     */
+    private Integer sort;
+
+    /**
+     * 是否显示
+     */
+    private String display;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;
@@ -101,6 +111,22 @@ public class Authority implements Serializable {
         this.fAuthorityId = fAuthorityId;
     }
 
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
+    }
+
     public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
@@ -127,6 +153,8 @@ public class Authority implements Serializable {
                 ", url='" + url + '\'' +
                 ", type='" + type + '\'' +
                 ", fAuthorityId=" + fAuthorityId +
+                ", sort=" + sort +
+                ", display='" + display + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", tbStatus='" + tbStatus + '\'' +

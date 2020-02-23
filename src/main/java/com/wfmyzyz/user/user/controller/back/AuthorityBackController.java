@@ -10,10 +10,7 @@ import com.wfmyzyz.user.user.service.IAuthorityService;
 import com.wfmyzyz.user.user.service.IRoleAuthorityService;
 import com.wfmyzyz.user.user.service.IRoleService;
 import com.wfmyzyz.user.user.service.IUserRoleService;
-import com.wfmyzyz.user.user.vo.AddAuthorityVo;
-import com.wfmyzyz.user.user.vo.DTree;
-import com.wfmyzyz.user.user.vo.TreeVo;
-import com.wfmyzyz.user.user.vo.UpdateAuthorityVo;
+import com.wfmyzyz.user.user.vo.*;
 import com.wfmyzyz.user.utils.ControllerUtils;
 import com.wfmyzyz.user.utils.Msg;
 import com.wfmyzyz.user.utils.TokenUtils;
@@ -53,6 +50,17 @@ public class AuthorityBackController {
     private IRoleService roleService;
     @Autowired
     private IUserRoleService userRoleService;
+
+    @ApiOperation(value="查询菜单列表", notes="查询菜单列表" ,httpMethod="POST")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="token",value="token",required=true,paramType="header")
+    })
+    @RequestMapping(value = "/getMenuList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public Msg getMenuList(HttpServletRequest request){
+        List<AuthorityTreeVo> authorityList = authorityService.getMenuListByUserId(request);
+        return Msg.success().add("data",authorityList);
+    }
+
 
     @ApiOperation(value="查询树形权限列表", notes="查询树形权限列表" ,httpMethod="POST")
     @ApiImplicitParams({
@@ -116,16 +124,20 @@ public class AuthorityBackController {
             @ApiImplicitParam(name="name",value="权限名",required=true,paramType="query",dataType="String"),
             @ApiImplicitParam(name="url",value="权限地址",required=true,paramType="query",dataType="String"),
             @ApiImplicitParam(name="type",value="权限类型",required=true,paramType="query",dataType="String"),
-            @ApiImplicitParam(name="fAuthorityId",value="权限ID",required=true,paramType="query",dataType="Integer")
+            @ApiImplicitParam(name="fAuthorityId",value="权限ID",required=true,paramType="query",dataType="Integer"),
+            @ApiImplicitParam(name="sort",value="排序",required=false,paramType="query",dataType="Integer"),
+            @ApiImplicitParam(name="display",value="是否显示",required=false,paramType="query",dataType="String")
     })
     @RequestMapping(value = "/addAuthority", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public Msg addAuthority(@Valid @RequestBody AddAuthorityVo addAuthorityVo, HttpServletRequest request){
         if (!Objects.equals(addAuthorityVo.getType(), AuthorityTypeEnum.页面.toString()) && !Objects.equals(addAuthorityVo.getType(),AuthorityTypeEnum.按钮.toString())){
             return Msg.error().add("error","状态格式错误");
         }
-        Authority authorityByUrl = authorityService.getAuthorityByUrl(addAuthorityVo.getUrl());
-        if (authorityByUrl != null){
-            return Msg.error().add("error","添加失败，该权限已存在");
+        if (StringUtils.isNotBlank(addAuthorityVo.getUrl())){
+            Authority authorityByUrl = authorityService.getAuthorityByUrl(addAuthorityVo.getUrl());
+            if (authorityByUrl != null){
+                return Msg.error().add("error","添加失败，该权限已存在");
+            }
         }
         if (Objects.equals(addAuthorityVo.getfAuthorityId(),0) && !Objects.equals(addAuthorityVo.getType(),AuthorityTypeEnum.页面.toString())){
             return Msg.error().add("error","添加失败，根权限不能为按钮");
@@ -143,16 +155,20 @@ public class AuthorityBackController {
             @ApiImplicitParam(name="authorityId",value="权限ID",required=true,paramType="query",dataType="String"),
             @ApiImplicitParam(name="authorityName",value="权限名称",required=true,paramType="query",dataType="String"),
             @ApiImplicitParam(name="authorityUrl",value="权限地址",required=true,paramType="query",dataType="String"),
-            @ApiImplicitParam(name="authorityType",value="权限类型",required=true,paramType="query",dataType="String")
+            @ApiImplicitParam(name="authorityType",value="权限类型",required=true,paramType="query",dataType="String"),
+            @ApiImplicitParam(name="sort",value="排序",required=false,paramType="query",dataType="Integer"),
+            @ApiImplicitParam(name="display",value="是否显示",required=false,paramType="query",dataType="String")
     })
     @RequestMapping(value = "/updateAuthority", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public Msg updateAuthority(@Valid @RequestBody UpdateAuthorityVo updateAuthorityVo, HttpServletRequest request){
         if (StringUtils.isBlank(updateAuthorityVo.getAuthorityName()) && StringUtils.isBlank(updateAuthorityVo.getAuthorityUrl()) && StringUtils.isBlank(updateAuthorityVo.getAuthorityType())){
             return Msg.error().add("error","您没有修改权限信息");
         }
-        Authority authorityByUrl = authorityService.getAuthorityByUrl(updateAuthorityVo.getAuthorityUrl());
-        if (authorityByUrl != null && !Objects.equals(authorityByUrl.getAuthorityId(),updateAuthorityVo.getAuthorityId())){
-            return Msg.error().add("error","修改失败，该权限已存在");
+        if (StringUtils.isNotBlank(updateAuthorityVo.getAuthorityUrl())) {
+            Authority authorityByUrl = authorityService.getAuthorityByUrl(updateAuthorityVo.getAuthorityUrl());
+            if (authorityByUrl != null && !Objects.equals(authorityByUrl.getAuthorityId(), updateAuthorityVo.getAuthorityId())) {
+                return Msg.error().add("error", "修改失败，该权限已存在");
+            }
         }
         Authority authority = authorityService.getById(updateAuthorityVo.getAuthorityId());
         if (Objects.equals(authority.getFAuthorityId(),0) && updateAuthorityVo.getAuthorityType() != null && !Objects.equals(updateAuthorityVo.getAuthorityType(),AuthorityTypeEnum.页面.toString())){

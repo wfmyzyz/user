@@ -2,6 +2,7 @@ package com.wfmyzyz.user.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wfmyzyz.user.config.ProjectConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author admin
@@ -56,6 +58,15 @@ public class TokenUtils {
      */
     public Integer getUserIdByToken(HttpServletRequest request){
         String token = request.getHeader(ProjectConfig.TOKEN_KEY);
+        return getUserIdByToken(token);
+    }
+
+    /**
+     * 根据token获取用户ID
+     * @param token
+     * @return
+     */
+    public Integer getUserIdByToken(String token){
         HashMap<String,String> keyMap = redisUtils.getValue(ProjectConfig.PUBLIC_PREFIX, HashMap.class);
         if (keyMap == null){
             return null;
@@ -99,6 +110,27 @@ public class TokenUtils {
             response.getWriter().println(resultText);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public boolean tokenIsExceed(HttpServletRequest request) {
+        String token = request.getHeader(ProjectConfig.TOKEN_KEY);
+        if (StringUtils.isBlank(token)){
+            return true;
+        }
+        String redisToken = redisUtils.getValue(ProjectConfig.TOKEN + token);
+        if (StringUtils.isBlank(redisToken)){
+            return true;
+        }
+        return false;
+    }
+
+    public void extendToken(HttpServletRequest request) {
+        Integer userId = getUserIdByToken(request);
+        String token = request.getHeader(ProjectConfig.TOKEN_KEY);
+        if (StringUtils.isNotBlank(token) && userId != null){
+            redisUtils.setKeyExpire(ProjectConfig.USER + userId,30, TimeUnit.MINUTES);
+            redisUtils.setKeyExpire(ProjectConfig.TOKEN+token,30, TimeUnit.MINUTES);
         }
     }
 }
