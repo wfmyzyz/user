@@ -1,7 +1,6 @@
 package com.wfmyzyz.user.user.controller.api;
 
 
-import com.sun.corba.se.impl.oa.toa.TOA;
 import com.wfmyzyz.user.user.bo.UserBo;
 import com.wfmyzyz.user.user.domain.Authority;
 import com.wfmyzyz.user.user.domain.User;

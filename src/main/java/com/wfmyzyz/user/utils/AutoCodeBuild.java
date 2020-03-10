@@ -18,7 +18,7 @@ import java.util.*;
 public class AutoCodeBuild {
 
     public static void main(String[] args) {
-        String tableName = "authority";
+        String tableName = "action";
         // 代码生成器
         AutoGenerator mpg = new AutoGenerator();
         mpg.setTemplateEngine(new FreemarkerTemplateEngine());
