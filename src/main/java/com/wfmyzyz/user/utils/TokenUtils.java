@@ -83,35 +83,6 @@ public class TokenUtils {
         return Integer.parseInt(userId);
     }
 
-    /**
-     * 过滤器重新登录
-     */
-    public void needLogin(HttpServletResponse response){
-        Msg msg = new Msg();
-        msg.setCode(206);
-        msg.setMsg("请登录！");
-        String resultText = JSONObject.toJSONString(msg);
-        try {
-            response.getWriter().println(resultText);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 过滤器告知没有权限
-     */
-    public void noAuthorityNeedLogin(HttpServletResponse response){
-        Msg msg = new Msg();
-        msg.setCode(208);
-        msg.setMsg("没有权限");
-        String resultText = JSONObject.toJSONString(msg);
-        try {
-            response.getWriter().println(resultText);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public boolean tokenIsExceed(HttpServletRequest request) {
         String token = request.getHeader(ProjectConfig.TOKEN_KEY);

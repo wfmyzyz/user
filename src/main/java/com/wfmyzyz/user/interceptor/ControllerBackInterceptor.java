@@ -3,6 +3,7 @@ package com.wfmyzyz.user.interceptor;
 import com.wfmyzyz.user.user.domain.Authority;
 import com.wfmyzyz.user.user.service.IAuthorityService;
 import com.wfmyzyz.user.user.service.IUserRoleService;
+import com.wfmyzyz.user.utils.Msg;
 import com.wfmyzyz.user.utils.RequestUtils;
 import com.wfmyzyz.user.utils.TokenUtils;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class ControllerBackInterceptor implements HandlerInterceptor {
             return true;
         }
         if (tokenUtils.tokenIsExceed(request)){
-            tokenUtils.needLogin(response);
+            Msg.needLogin(response);
             return false;
         }
         //延长redis过期时间
@@ -50,12 +51,12 @@ public class ControllerBackInterceptor implements HandlerInterceptor {
         }
         List<Authority> authorityList = authorityService.getAuthorityList(request);
         if (authorityList == null || authorityList.size() == 0){
-            tokenUtils.noAuthorityNeedLogin(response);
+            Msg.noPower(response);
             return false;
         }
         List<String> urlList = authorityList.stream().map(Authority::getUrl).distinct().collect(Collectors.toList());
         if (!urlList.contains(requestURI)){
-            tokenUtils.noAuthorityNeedLogin(response);
+            Msg.noPower(response);
             return false;
         }
         return true;

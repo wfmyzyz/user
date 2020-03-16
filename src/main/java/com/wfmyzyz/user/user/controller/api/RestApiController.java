@@ -1,6 +1,7 @@
 package com.wfmyzyz.user.user.controller.api;
 
 
+import com.wfmyzyz.user.config.ProjectConfig;
 import com.wfmyzyz.user.user.bo.UserBo;
 import com.wfmyzyz.user.user.domain.Authority;
 import com.wfmyzyz.user.user.domain.User;
@@ -8,6 +9,7 @@ import com.wfmyzyz.user.user.service.IAuthorityService;
 import com.wfmyzyz.user.user.service.IUserRoleService;
 import com.wfmyzyz.user.user.service.IUserService;
 import com.wfmyzyz.user.utils.Msg;
+import com.wfmyzyz.user.utils.RedisUtils;
 import com.wfmyzyz.user.utils.TokenUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,6 +41,8 @@ public class RestApiController {
     private IAuthorityService authorityService;
     @Autowired
     private IUserRoleService userRoleService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 外部服务验证权限
@@ -56,6 +60,10 @@ public class RestApiController {
         }
         if (StringUtils.isBlank(url)){
             return Msg.error("url为空！");
+        }
+        String redisToken = redisUtils.getValue(ProjectConfig.TOKEN + token);
+        if (StringUtils.isBlank(redisToken)){
+            return Msg.needLogin();
         }
         Integer userId = tokenUtils.getUserIdByToken(token);
         if (userId == null){

@@ -1,5 +1,6 @@
 package com.wfmyzyz.user.interceptor;
 
+import com.wfmyzyz.user.utils.Msg;
 import com.wfmyzyz.user.utils.RequestUtils;
 import com.wfmyzyz.user.utils.TokenUtils;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class ControllerBaseInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         logger.info("Base访问:IP地址["+RequestUtils.getIpAddr(request)+"],访问路径["+request.getRequestURL()+"]");
-        tokenUtils.noAuthorityNeedLogin(response);
+        Msg.noPower(response);
         return false;
     }
 }
