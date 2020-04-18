@@ -45,6 +45,17 @@ public class UserBackController {
 
     @ApiOperation(value="查询用户列表", notes="查询用户列表" ,httpMethod="POST")
     @ApiImplicitParams({
+            @ApiImplicitParam(name="token",value="token",required=true,paramType="header")
+    })
+    @RequestMapping(value = "/getMessage", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public Msg getMessage(HttpServletRequest request){
+        Integer userId = tokenUtils.getUserIdByToken(request);
+        User user = userService.getById(userId);
+        return Msg.success().add("data",user);
+    }
+
+    @ApiOperation(value="查询用户列表", notes="查询用户列表" ,httpMethod="POST")
+    @ApiImplicitParams({
             @ApiImplicitParam(name="token",value="token",required=true,paramType="header"),
             @ApiImplicitParam(name="page",value="页数",required=true,paramType="query",dataType="Integer"),
             @ApiImplicitParam(name="limit",value="页数据数",required=true,paramType="query",dataType="Integer"),
